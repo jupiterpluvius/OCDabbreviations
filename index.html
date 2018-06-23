@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+    @font-face {
+        font-family: webly;
+        src: url(weblysleekuil.ttf);
+    }
+    @font-face {
+        font-family: webly-heavier;
+        src: url(weblysleekuisl.ttf);
+    }
+    @font-face {
+        font-family: webly-heavier;
+        src: url(weblysleekuisli.ttf);
+        font-style: italic;
+    }
+    html {
+      box-sizing: border-box;
+      background: #ffc670;
+      font-family: webly-heavier;
+      font-size: 15px;
+      margin-left: calc(100vw - 100%);
+    }
+    *, *:before, *:after {
+      box-sizing: inherit;
+    }
+
+    h1 {
+        font-size: 40px;
+        margin:50px auto 0;
+        text-align:center;
+        font-family: webly;
+    }
+
+    input {
+      width: 100%;
+      padding:20px;
+    }
+
+    .search-form {
+      max-width:600px;
+      margin:50px auto;
+    }
+
+    input.search {
+      margin: 0;
+      text-align: center;
+      outline:0;
+      border: 10px solid #F7F7F7;
+      width: 120%;
+      left: -10%;
+      position: relative;
+      top: 10px;
+      border-radius: 5px;
+      font-size: 40px;
+      font-weight: 200;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.12), inset 0 0 2px rgba(0, 0, 0, 0.19);
+    }
+
+    table {
+        width:100%;
+        border-collapse: collapse;
+    }
+    table,tr,td {border:0;margin:0;}
+
+    .suggestions {
+      margin: -2px;
+      padding: 0;
+      background-color: #FFF;
+      position: relative;
+    }
+    .suggestions td {
+      border-bottom: 1px solid #D8D8D8;
+      margin:0;
+      padding:10px;
+    }
+    .suggestions tr:nth-child(odd) {
+        background-color: #F7F7F7;
+    }
+    .abbr {width: 150px;}
+    .expanded {
+        width:auto;
+    }
+</style>
+</head>
+<body>
+
+    <h1>Oxford Classical Dictionary abbreviations lookup</h1>
+
+    <form class="search-form">
+        <input type="text" class="search" placeholder="Search for . . .">
+        <table class="suggestions">
+        </table>
+    </form>
+
+    <script>
+        
+        const endpoint = "OCDabbreviations.json";
+        const lookUp = [];
+
+        fetch(endpoint)
+            .then(blob => blob.json())
+            .then(data => lookUp.push(...data));                                   //... = "spread"
+
+function findMatches(wordToMatch, lookUp) {
+    return lookUp.filter(brief => {                                                 // how do arrow functions work?
+        const regex = new RegExp(wordToMatch + "(?!([^<]+)?>)", "gi");      // regex to skip html tags
+        if(wordToMatch != "") {
+            return brief.abbr.match(regex) || brief.expanded.match(regex)       // || = or
+        }
+    });
+}
+
+function displayMatches() {
+    const matchArray = findMatches(this.value, lookUp);
+    const html = matchArray.map(brief => {
+        // const regex = new RegExp(this.value + "(?!([^<]+)?>)", "g");
+        // const foundAbbr = brief.abbr.replace(regex, `<span class="highlight">${this.value}</span>`);                // template literals are awesome
+        // const foundExpanded = brief.expanded.replace(regex, `<span class="highlight">${this.value}</span>`);
+        return `
+                <tr>
+                <td class="abbr">${brief.abbr}</td>
+                <td class="expanded">${brief.expanded}</td>
+                </tr>
+        `;
+    }).join("");                                                                        // un-array it
+    suggestions.innerHTML = html;
+}
+
+const searchInput = document.querySelector(".search");
+const suggestions = document.querySelector(".suggestions");
+
+searchInput.addEventListener("change", displayMatches);                     // cover both kinds of events
+searchInput.addEventListener("keyup", displayMatches);
+
+document.querySelector(".search").focus();                                              // put the cursor where you want it
+
+    </script>
+</body>
+</html>
