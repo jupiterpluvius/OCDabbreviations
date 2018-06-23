@@ -69,7 +69,7 @@
     table,tr,td {border:0;margin:0;}
 
     .suggestions {
-      margin: -2px;
+      margin: 0;
       padding: 0;
       background-color: #FFF;
       position: relative;
@@ -109,7 +109,7 @@
 
 function findMatches(wordToMatch, lookUp) {
     return lookUp.filter(brief => {                                                 // how do arrow functions work?
-        const regex = new RegExp(wordToMatch + "(?!([^<]+)?>)", "gi");      // regex to skip html tags
+        const regex = new RegExp("\\b" + wordToMatch + "(?!([^<]+)?>)", "gi");      // regex to skip html tags
         if(wordToMatch != "") {
             return brief.abbr.match(regex) || brief.expanded.match(regex)       // || = or
         }
